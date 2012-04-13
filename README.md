@@ -8,3 +8,6 @@ Like the hqxSharp project, the focus of this code is asset creation and usage in
 
 ## Usage
 Look in the wiki for usage information
+
+## Examples
+For examples, go to Maxim Stepin hqx pages ([hq2x](http://www.hiend3d.com/hq2x.html) and [hq3x](http://www.hiend3d.com/hq3x.html))
