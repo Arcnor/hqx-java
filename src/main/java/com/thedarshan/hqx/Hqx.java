@@ -23,7 +23,8 @@
  * along with hqx-java. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package hqx;
+package com.thedarshan.hqx;
+
 
 abstract class Hqx {
 	private static final int Ymask = 0x00FF0000;

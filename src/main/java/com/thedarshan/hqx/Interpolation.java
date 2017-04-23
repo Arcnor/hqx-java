@@ -23,7 +23,8 @@
  * along with hqx-java. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package hqx;
+package com.thedarshan.hqx;
+
 
 /**
  * Helper class to interpolate colors. Nothing to see here, move along...

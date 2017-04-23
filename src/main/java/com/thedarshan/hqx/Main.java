@@ -5,6 +5,7 @@ import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import static java.util.Arrays.asList;
 import java.util.Map;
 import java.util.logging.Level;
@@ -48,30 +49,25 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("hqx image converter");
+        System.out.println("Working Directory -> " + System.getProperty("user.dir"));
 
         OptionParser parser = initParser();
         OptionSet options = parser.parse(args);
 
-        String inputFile;
-        String outputFile;
+        String inputFile="";
+        String outputFile="";
         int nformat = 0;
 
-        if (options.hasArgument("help") || options.hasArgument("?")) {
-            nformat++;
+        if(args.length==0){
+            System.err.println("Must specify at least the input file");
+            return;
         }
-
-        if (options.hasArgument("hq2x")) {
-            nformat++;
-        }
-        if (options.hasArgument("hq3x")) {
-            nformat++;
-        }
-        if (options.hasArgument("hq4x")) {
-            nformat++;
-        }
-        if (options.hasArgument("all")) {
-            nformat += 2;
-        }
+            
+        
+        if (options.has("hq2x")) nformat++;
+        if (options.has("hq3x")) nformat++;
+        if (options.has("hq4x")) nformat++;
+        if (options.has("all" )) nformat += 2;
 
         if (nformat == 0) {
             System.err.println("No scaling method specified, hq2x will be used.");
@@ -83,14 +79,20 @@ public class Main {
 
         if (options.hasArgument("input")) {
             inputFile = (String) options.valueOf("input");
-        }
-        if (options.hasArgument("?") || options.hasArgument("h") || options.hasArgument("help")) {
-            System.out.println("Cicciput");
+        }else{            
+            inputFile=args[args.length-1];
+        
         }
 
         if (options.hasArgument("output") && nformat > 0) {
             System.err.println("Can't specify output for multiple conversion, standard pattern will be used.");
         }
+        
+        RgbYuv.hqxInit();
+        if (options.has("hq2x")||options.has("all" )) convert(inputFile, outputFile, hq2x);
+        if (options.has("hq3x")||options.has("all" )) convert(inputFile, outputFile, hq3x);
+        if (options.has("hq4x")||options.has("all" )) convert(inputFile, outputFile, hq4x);
+        RgbYuv.hqxDeinit();
 
     }
 
@@ -99,7 +101,8 @@ public class Main {
         
         if(algo>hq4x)return false;
         
-        if(outputFile==null || outputFile.length()<1)outputFile=inputFile+algo+".png";
+        if(outputFile==null || outputFile.length()<1)outputFile=MessageFormat.format("{0}_hq{1}x.png",inputFile, algo);
+                
         
         
         try {
@@ -117,9 +120,6 @@ public class Main {
             }
             // Obtain pixel data for source image
             final int[] data = ((DataBufferInt) bi.getRaster().getDataBuffer()).getData();
-
-            // Initialize lookup tables
-            RgbYuv.hqxInit();
 
             // Create the destination image, twice as large for 2x algorithm
             final BufferedImage destinationBuffer = new BufferedImage(bi.getWidth() * algo, bi.getHeight() * algo, BufferedImage.TYPE_INT_ARGB);
@@ -146,7 +146,6 @@ public class Main {
                 System.err.println("Can't write image to " + outputFile);
             }
 
-            RgbYuv.hqxDeinit();
             return true;
         }
         System.err.println("Can't convert " + inputFile);

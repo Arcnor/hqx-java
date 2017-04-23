@@ -23,7 +23,7 @@
  * along with hqx-java. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package hqx;
+package com.thedarshan.hqx;
 
 public final class RgbYuv {
 	private static final int rgbMask = 0x00FFFFFF;

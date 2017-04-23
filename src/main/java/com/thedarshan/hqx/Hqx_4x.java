@@ -23,7 +23,9 @@
  * along with hqx-java. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package hqx;
+package com.thedarshan.hqx;
+
+
 
 public class Hqx_4x extends Hqx {
 	/**
