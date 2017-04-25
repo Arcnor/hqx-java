@@ -30,8 +30,8 @@ public class Main {
     private static OptionParser initParser() {
         OptionParser parser = new OptionParser();
         parser.accepts("hq2x", "Upscale the input file with hq2x");
-        parser.accepts("hq3x", "Upscale the input file with hq2x");
-        parser.accepts("hq4x", "Upscale the input file with hq2x");
+        parser.accepts("hq3x", "Upscale the input file with hq3x");
+        parser.accepts("hq4x", "Upscale the input file with hq4x");
         parser.accepts("all", "Upscale the input file with hq2x,hq3x,hq4x");
         parser.accepts("output", "Override the default naming convention for output file").withRequiredArg();
         parser.accepts("input", "Specify input file").withRequiredArg();
