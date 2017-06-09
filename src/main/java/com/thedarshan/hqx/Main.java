@@ -22,10 +22,10 @@ import joptsimple.OptionSet;
  * @author Darshan
  */
 public class Main {
-    
-    public static final short hq2x=2;
-    public static final short hq3x=3;
-    public static final short hq4x=4;
+
+    public static final short hq2x = 2;
+    public static final short hq3x = 3;
+    public static final short hq4x = 4;
 
     private static OptionParser initParser() {
         OptionParser parser = new OptionParser();
@@ -54,20 +54,27 @@ public class Main {
         OptionParser parser = initParser();
         OptionSet options = parser.parse(args);
 
-        String inputFile="";
-        String outputFile="";
+        String inputFile = "";
+        String outputFile = "";
         int nformat = 0;
 
-        if(args.length==0){
-            System.err.println("Must specify at least the input file");
+        if (args.length == 0) {
+            System.err.println("Must specify the input file at least");
             return;
         }
-            
-        
-        if (options.has("hq2x")) nformat++;
-        if (options.has("hq3x")) nformat++;
-        if (options.has("hq4x")) nformat++;
-        if (options.has("all" )) nformat += 2;
+
+        if (options.has("hq2x")) {
+            nformat++;
+        }
+        if (options.has("hq3x")) {
+            nformat++;
+        }
+        if (options.has("hq4x")) {
+            nformat++;
+        }
+        if (options.has("all")) {
+            nformat += 2;
+        }
 
         if (nformat == 0) {
             System.err.println("No scaling method specified, hq2x will be used.");
@@ -79,65 +86,95 @@ public class Main {
 
         if (options.hasArgument("input")) {
             inputFile = (String) options.valueOf("input");
-        }else{            
-            inputFile=args[args.length-1];
-        
+        } else {
+            inputFile = args[args.length - 1];
+
         }
 
         if (options.hasArgument("output") && nformat > 0) {
             System.err.println("Can't specify output for multiple conversion, standard pattern will be used.");
         }
-        
+
+        if (!(options.has("hq2x") || options.has("all") || options.has("hq2x") || options.has("hq2x"))) {
+            return;
+        }
+
+        BufferedImage inputImage;
+        try {
+            inputImage = ImageIO.read(new FileInputStream(inputFile));
+        } catch (IOException ex) {
+            System.err.println("Can't load " + inputFile);
+            return;
+        }
+
         RgbYuv.hqxInit();
-        if (options.has("hq2x")||options.has("all" )) convert(inputFile, outputFile, hq2x);
-        if (options.has("hq3x")||options.has("all" )) convert(inputFile, outputFile, hq3x);
-        if (options.has("hq4x")||options.has("all" )) convert(inputFile, outputFile, hq4x);
+        if (options.has("hq2x") || options.has("all")) {
+            convert(inputImage,inputFile, outputFile, hq2x);
+        }
+        if (options.has("hq3x") || options.has("all")) {
+            convert(inputImage,inputFile, outputFile, hq3x);
+        }
+        if (options.has("hq4x") || options.has("all")) {
+            convert(inputImage,inputFile, outputFile, hq4x);
+        }
         RgbYuv.hqxDeinit();
 
     }
+    
+    private static boolean convert(BufferedImage inputImage, String outputFile, short algo){
+        return convert(inputImage,"" , outputFile, algo);
+    }
+    
+    private static boolean convert(String inputFile, String outputFile, short algo){
+        return convert(null, inputFile , outputFile, algo);
+    }
+    
 
-    private static boolean convert(String inputFile, String outputFile, short algo) {
-        BufferedImage bi;
-        
-        if(algo>hq4x)return false;
-        
-        if(outputFile==null || outputFile.length()<1)outputFile=MessageFormat.format("{0}_hq{1}x.png",inputFile, algo);
-                
-        
-        
-        try {
-            bi = ImageIO.read(new FileInputStream(inputFile));
-        } catch (IOException ex) {
-            System.err.println("Can't load " + inputFile);
+    private static boolean convert(BufferedImage inputImage, String inputFile, String outputFile, short algo) {
+
+        if (algo > hq4x) {
             return false;
         }
-        if (bi != null) {
+
+        if (outputFile == null || outputFile.length() < 1) {
+            outputFile = MessageFormat.format("{0}_hq{1}x.png", inputFile, algo);
+        }
+
+        if (inputImage == null) {
+            try {
+                inputImage = ImageIO.read(new FileInputStream(inputFile));
+            } catch (IOException ex) {
+                System.err.println("Can't load " + inputFile);
+                return false;
+            }
+        }
+        if (inputImage != null) {
             // Convert image to ARGB if on another format
-            if (bi.getType() != BufferedImage.TYPE_INT_ARGB && bi.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
-                final BufferedImage temp = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                temp.getGraphics().drawImage(bi, 0, 0, null);
-                bi = temp;
+            if (inputImage.getType() != BufferedImage.TYPE_INT_ARGB && inputImage.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
+                final BufferedImage temp = new BufferedImage(inputImage.getWidth(), inputImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                temp.getGraphics().drawImage(inputImage, 0, 0, null);
+                inputImage = temp;
             }
             // Obtain pixel data for source image
-            final int[] data = ((DataBufferInt) bi.getRaster().getDataBuffer()).getData();
+            final int[] data = ((DataBufferInt) inputImage.getRaster().getDataBuffer()).getData();
 
             // Create the destination image, twice as large for 2x algorithm
-            final BufferedImage destinationBuffer = new BufferedImage(bi.getWidth() * algo, bi.getHeight() * algo, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage destinationBuffer = new BufferedImage(inputImage.getWidth() * algo, inputImage.getHeight() * algo, BufferedImage.TYPE_INT_ARGB);
             // Obtain pixel data for destination image
-            final int[] dataDest = ((DataBufferInt) destinationBuffer.getRaster().getDataBuffer()).getData();            
+            final int[] dataDest = ((DataBufferInt) destinationBuffer.getRaster().getDataBuffer()).getData();
             // Resize it
-            switch(algo){
+            switch (algo) {
                 case hq2x:
-                    Hqx_2x.hq2x_32_rb(data, dataDest, bi.getWidth(), bi.getHeight());
+                    Hqx_2x.hq2x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
                 case hq3x:
-                    Hqx_3x.hq3x_32_rb(data, dataDest, bi.getWidth(), bi.getHeight());
+                    Hqx_3x.hq3x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
                 case hq4x:
-                    Hqx_4x.hq4x_32_rb(data, dataDest, bi.getWidth(), bi.getHeight());
+                    Hqx_4x.hq4x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
                 default:
-                    return false;                    
+                    return false;
             }
             try {
                 // Save our result
