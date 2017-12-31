@@ -38,15 +38,23 @@ public class Main {
         parser.acceptsAll(asList("h", "?", "help"), "show help").forHelp();
         parser.formatHelpWith(new CustomHelpFormatter());
 
-        try {
+        /*try {
             parser.printHelpOn(System.out);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 
         return parser;
     }
 
+    public static void showHelp(OptionParser parser){
+        try {    
+            parser.printHelpOn(System.out);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public static void main(String[] args) {
         System.out.println("hqx image converter");
         System.out.println("Working Directory -> " + System.getProperty("user.dir"));
@@ -60,6 +68,7 @@ public class Main {
 
         if (args.length == 0) {
             System.err.println("Must specify the input file at least");
+            showHelp(parser);
             return;
         }
 
@@ -81,7 +90,7 @@ public class Main {
         }
 
         if (options.hasArgument("output")) {
-            inputFile = (String) options.valueOf("output");
+            outputFile = (String) options.valueOf("output");
         }
 
         if (options.hasArgument("input")) {
@@ -92,10 +101,12 @@ public class Main {
         }
 
         if (options.hasArgument("output") && nformat > 0) {
-            System.err.println("Can't specify output for multiple conversion, standard pattern will be used.");
+            System.err.println("Can't specify output for multiple conversion, standard pattern will be used.");            
         }
 
-        if (!(options.has("hq2x") || options.has("all") || options.has("hq2x") || options.has("hq2x"))) {
+        if (!(options.has("hq2x") || options.has("all") || options.has("hq3x") || options.has("hq4x"))) {
+            System.err.println("You have to specify at least one scaling type");
+            showHelp(parser);
             return;
         }
 
@@ -107,17 +118,20 @@ public class Main {
             return;
         }
 
-        RgbYuv.hqxInit();
+        RgbYuv.RgbYuv_init();
         if (options.has("hq2x") || options.has("all")) {
+            System.err.println("Scaling " + inputFile + " with hq2x");
             convert(inputImage,inputFile, outputFile, hq2x);
         }
         if (options.has("hq3x") || options.has("all")) {
+            System.err.println("Scaling " + inputFile + " with hq3x");
             convert(inputImage,inputFile, outputFile, hq3x);
         }
         if (options.has("hq4x") || options.has("all")) {
+            System.err.println("Scaling " + inputFile + " with hq4x");
             convert(inputImage,inputFile, outputFile, hq4x);
         }
-        RgbYuv.hqxDeinit();
+        RgbYuv.RgbYuv_dispose();
 
     }
     
