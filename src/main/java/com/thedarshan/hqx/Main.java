@@ -23,9 +23,9 @@ import joptsimple.OptionSet;
  */
 public class Main {
 
-    public static final short hq2x = 2;
-    public static final short hq3x = 3;
-    public static final short hq4x = 4;
+    public static final short HQ2X = 2;
+    public static final short HQ3X = 3;
+    public static final short HQ4X = 4;
 
     private static OptionParser initParser() {
         OptionParser parser = new OptionParser();
@@ -37,12 +37,6 @@ public class Main {
         parser.accepts("input", "Specify input file").withRequiredArg();
         parser.acceptsAll(asList("h", "?", "help"), "show help").forHelp();
         parser.formatHelpWith(new CustomHelpFormatter());
-
-        /*try {
-            parser.printHelpOn(System.out);
-        } catch (IOException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
 
         return parser;
     }
@@ -121,15 +115,15 @@ public class Main {
         RgbYuv.RgbYuv_init();
         if (options.has("hq2x") || options.has("all")) {
             System.err.println("Scaling " + inputFile + " with hq2x");
-            convert(inputImage,inputFile, outputFile, hq2x);
+            convert(inputImage,inputFile, outputFile, HQ2X);
         }
         if (options.has("hq3x") || options.has("all")) {
             System.err.println("Scaling " + inputFile + " with hq3x");
-            convert(inputImage,inputFile, outputFile, hq3x);
+            convert(inputImage,inputFile, outputFile, HQ3X);
         }
         if (options.has("hq4x") || options.has("all")) {
             System.err.println("Scaling " + inputFile + " with hq4x");
-            convert(inputImage,inputFile, outputFile, hq4x);
+            convert(inputImage,inputFile, outputFile, HQ4X);
         }
         RgbYuv.RgbYuv_dispose();
 
@@ -146,7 +140,7 @@ public class Main {
 
     private static boolean convert(BufferedImage inputImage, String inputFile, String outputFile, short algo) {
 
-        if (algo > hq4x) {
+        if (algo > HQ4X) {
             return false;
         }
 
@@ -178,13 +172,13 @@ public class Main {
             final int[] dataDest = ((DataBufferInt) destinationBuffer.getRaster().getDataBuffer()).getData();
             // Resize it
             switch (algo) {
-                case hq2x:
+                case HQ2X:
                     Hqx_2x.hq2x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
-                case hq3x:
+                case HQ3X:
                     Hqx_3x.hq3x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
-                case hq4x:
+                case HQ4X:
                     Hqx_4x.hq4x_32_rb(data, dataDest, inputImage.getWidth(), inputImage.getHeight());
                     break;
                 default:
@@ -216,7 +210,7 @@ public class Main {
         public String format(Map<String, ? extends OptionDescriptor> options) {
             StringBuilder sb = new StringBuilder();
             sb.append("Usage -> hqx.jar [options] inputFile\n");
-            sb.append("\t the input file can olso be specified with an option \n");
+            sb.append("\t the input file can also be specified with an option \n");
             sb.append("\t If not overriden output file name will be inputfile.hq2x.png of hq2x \n");
             sb.append("\t hq3x.png for hq3x and so on \n \n");
             sb.append(baseFormatter.format(options));

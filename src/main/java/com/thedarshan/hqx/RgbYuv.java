@@ -24,10 +24,6 @@
  */
 package com.thedarshan.hqx;
 
-import javafx.geometry.Point3D;
-
-
-
 public final class RgbYuv {
 
     private static final int rgbMask = 0x00FFFFFF;
