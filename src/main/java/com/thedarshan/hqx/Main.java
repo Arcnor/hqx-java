@@ -166,7 +166,7 @@ public class Main {
             // Obtain pixel data for source image
             final int[] data = ((DataBufferInt) inputImage.getRaster().getDataBuffer()).getData();
 
-            // Create the destination image, twice as large for 2x algorithm
+            // Create the destination image, with the correct size
             final BufferedImage destinationBuffer = new BufferedImage(inputImage.getWidth() * algo, inputImage.getHeight() * algo, BufferedImage.TYPE_INT_ARGB);
             // Obtain pixel data for destination image
             final int[] dataDest = ((DataBufferInt) destinationBuffer.getRaster().getDataBuffer()).getData();
@@ -190,7 +190,6 @@ public class Main {
             } catch (IOException ex) {
                 System.err.println("Can't write image to " + outputFile);
             }
-
             return true;
         }
         System.err.println("Can't convert " + inputFile);

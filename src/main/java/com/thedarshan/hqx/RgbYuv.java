@@ -27,7 +27,7 @@ package com.thedarshan.hqx;
 public final class RgbYuv {
 
     private static final int rgbMask = 0x00FFFFFF;
-    private static int[] RGBtoYUV = new int[0x1000000];
+    private static int[] RGBtoYUV;
 
     /**
      * Returns the 24bit YUV equivalent of the provided 24bit RGB color.<b>Any
@@ -46,6 +46,8 @@ public final class RgbYuv {
      */
     public static void RgbYuv_init() {
         /* Initalize RGB to YUV lookup table */
+        if(RGBtoYUV == null)
+            RGBtoYUV = new int[0x1000000];
         int r, g, b, y, u, v;
         for (int c = 0x1000000 - 1; c >= 0; c--) {
             r = (c & 0xFF0000) >> 16;
@@ -65,5 +67,9 @@ public final class RgbYuv {
      */
     public static void RgbYuv_dispose() {
         RGBtoYUV = null;
+    }
+    
+    static{
+        RgbYuv_init();
     }
 }
